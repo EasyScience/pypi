@@ -22,7 +22,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: CrysFML_SRC
-        path: ${{ github.workspace }}/dist/*.whl    
+        path: ${{ github.workspace }}
         
 
   create-Linux:
