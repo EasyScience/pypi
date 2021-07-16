@@ -12,12 +12,13 @@ on:
 jobs:
   create-Linux:
     runs-on: ubuntu-latest
-
+    env:
+      BUILD_BRANCH: feature-python_api-build_wheels
     steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: https://code.ill.fr/scientific-software/crysfml/
-        ref: feature-python_api-build_wheels
+    - name: Checkout ILL repo 
+      run: |
+        git clone https://code.ill.fr/scientific-software/crysfml/ ./
+        git checkout ${ env.BUILD_BRANCH }
         
     - name: Build manylinux wheels
       run:  docker run -e PLAT=manylinux2010_x86_64 -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
@@ -36,12 +37,15 @@ jobs:
         gcc_v: [ 10 ] # Version of GFortran we want to use.
 
     runs-on: ${{ matrix.os }}
-
+    
+    env:
+      BUILD_BRANCH: feature-python_api-build_wheels
+      
     steps:
-    - uses: actions/checkout@v2
-      with:
-        repository: https://code.ill.fr/scientific-software/crysfml/
-        ref: feature-python_api-build_wheels
+    - name: Checkout ILL repo 
+      run: |
+        git clone https://code.ill.fr/scientific-software/crysfml/ ./
+        git checkout ${ env.BUILD_BRANCH }
 
     - name: Setup python
       uses: actions/setup-python@v1
