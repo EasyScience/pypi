@@ -10,14 +10,30 @@ on:
     branches: [ master ]
 
 jobs:
-  create-Linux:
-    runs-on: ubuntu-latest
 
+  get_Latest:
+    runs-on: ubuntu-latest
+    
     steps:
     - name: Checkout ILL repo 
       run: |
         git clone https://code.ill.fr/scientific-software/crysfml/ ./
         git checkout feature-python_api-build_wheels
+    - uses: actions/upload-artifact@v2
+      with:
+        name: CrysFML_SRC
+        path: ${{ github.workspace }}/dist/*.whl    
+        
+
+  create-Linux:
+    runs-on: ubuntu-latest
+    
+    needs: get_Latest
+    
+    steps:
+    - uses: actions/download-artifact@v2
+      with:
+        name: CrysFML_SRC
         
     - name: Build manylinux wheels
       run:  docker run -e PLAT=manylinux2010_x86_64 -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
@@ -37,11 +53,12 @@ jobs:
 
     runs-on: ${{ matrix.os }}
       
+    needs: get_Latest
+    
     steps:
-    - name: Checkout ILL repo 
-      run: |
-        git clone https://code.ill.fr/scientific-software/crysfml/ ./
-        git checkout feature-python_api-build_wheels
+    - uses: actions/download-artifact@v2
+      with:
+        name: CrysFML_SRC
         
     - name: Setup python
       uses: actions/setup-python@v1
