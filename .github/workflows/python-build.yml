@@ -22,7 +22,7 @@ jobs:
       run: |
         git clone https://code.ill.fr/scientific-software/crysfml/ ./
         git checkout feature-python_api-build_wheels
-        rm -rf ./.git ./Html ./Program_Examples
+        rm -rf ./.git ./Html
     - uses: actions/upload-artifact@v2
       with:
         name: CrysFML_SRC
@@ -42,8 +42,6 @@ jobs:
         
     - name: Build manylinux wheels
       run:  |
-        ls ./
-        ls ./Scripts/
         chmod +x ./Scripts/buildscript.sh
         docker run -e PLAT=manylinux2010_x86_64 -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
 
