@@ -38,9 +38,6 @@ jobs:
         gcc_v: [ 10 ] # Version of GFortran we want to use.
 
     runs-on: ${{ matrix.os }}
-    
-    env:
-      BUILD_BRANCH: feature-python_api-build_wheels
       
     steps:
     - name: Checkout ILL repo 
