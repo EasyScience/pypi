@@ -17,9 +17,7 @@ jobs:
     - name: Checkout ILL repo 
       run: |
         git clone https://code.ill.fr/scientific-software/crysfml/ ./
-        git checkout ${{ BUILD_BRANCH }}
-      env:
-        BUILD_BRANCH: feature-python_api-build_wheels
+        git checkout feature-python_api-build_wheels
         
     - name: Build manylinux wheels
       run:  docker run -e PLAT=manylinux2010_x86_64 -v `pwd`:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
@@ -43,9 +41,7 @@ jobs:
     - name: Checkout ILL repo 
       run: |
         git clone https://code.ill.fr/scientific-software/crysfml/ ./
-        git checkout ${{ BUILD_BRANCH }}
-      env:
-        BUILD_BRANCH: feature-python_api-build_wheels
+        git checkout feature-python_api-build_wheels
         
     - name: Setup python
       uses: actions/setup-python@v1
