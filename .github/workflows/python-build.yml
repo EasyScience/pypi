@@ -96,13 +96,9 @@ jobs:
     needs: get_Latest
     
     steps:
-      - uses: actions/checkout@v2
-
-#       - uses: conda-incubator/setup-miniconda@v2
-#         with:
-#           auto-update-conda: true
-#           python-version: ${{ matrix.python-version }}
-#           auto-activate-base: true
+      - uses: actions/download-artifact@v2
+        with:
+          name: CrysFML_SRC
 
       - uses: msys2/setup-msys2@v2
         with:
