@@ -127,6 +127,6 @@ jobs:
         allowUpdates: true
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "*.whl"
+        artifacts: "./**/*.whl"
         tag: "CurrentBuild"
         body: "This is a build of the CFML libraries."
