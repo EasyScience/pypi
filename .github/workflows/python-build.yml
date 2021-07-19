@@ -93,6 +93,8 @@ jobs:
         os: [ windows-latest ]
 
     runs-on: ${{ matrix.os }}
+    needs: get_Latest
+    
     steps:
       - uses: actions/checkout@v2
 
