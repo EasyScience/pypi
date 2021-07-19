@@ -93,7 +93,8 @@ jobs:
     runs-on: ubuntu-latest
     
     needs: get_Latest
-    
+    strategy:
+      fail-fast: false
     steps:
     - uses: actions/checkout@v2
     - uses: actions/download-artifact@v2
