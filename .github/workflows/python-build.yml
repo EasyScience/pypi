@@ -110,7 +110,9 @@ jobs:
       - name: Build CFML
         shell: msys2 {0}
         id: build
-        run: python setup.py bdist_wheel
+        run: |
+          pip install wheel
+          python setup.py bdist_wheel
         env:
           MINGW_ARCH: MINGW64
 
