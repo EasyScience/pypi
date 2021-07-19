@@ -22,7 +22,7 @@ repo_gpgcheck=1
 gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 EOF'
 rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
-install intel-oneapi-ifort
+yum -y install intel-oneapi-ifort
 source /opt/intel/oneapi/setvars.sh
 
 # Compile wheels
