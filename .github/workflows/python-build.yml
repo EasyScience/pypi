@@ -114,7 +114,7 @@ jobs:
           pip install wheel delvewheel
           pip wheel ./ --no-deps -w ./old/
           delvewheel show ./old/*.whl
-          delvewheel repair -w dist -v ./old/*.whl
+          delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
         env:
           MINGW_ARCH: MINGW64
 
