@@ -23,7 +23,7 @@ gpgkey=https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.
 EOF'
 rpm --import https://yum.repos.intel.com/intel-gpg-keys/GPG-PUB-KEY-INTEL-SW-PRODUCTS.PUB
 yum -y install intel-oneapi-ifort
-/opt/intel/oneapi/setvars.sh
+source /opt/intel/oneapi/setvars.sh intel64
 
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
