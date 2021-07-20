@@ -100,13 +100,6 @@ jobs:
         with:
           name: CrysFML_SRC
           
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-          auto-activate-base: true
-
-
       - uses: msys2/setup-msys2@v2
         with:
           msystem: MSYS
@@ -118,8 +111,6 @@ jobs:
         shell: msys2 {0}
         id: build
         run: |
-          C:\Windows\system32\cmd.exe /D /S /C "C:\Miniconda\condabin\conda.bat activate test
-          which python
           pip install wheel delvewheel
           pip wheel ./ --no-deps -w ./old/
           delvewheel show ./old/*.whl
