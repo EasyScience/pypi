@@ -109,17 +109,13 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install -c conda-forge fortran-compiler
-          conda list
-          which gfortran
-          which python
-          python -V
-          mkdir build
-          cd build
-          which python
-          cmake -DUSE_HDF=off -DGUI=off -DPYTHON_API=on -G"MinGW Makefiles" -DCMAKE_Fortran_COMPILER="C:/ProgramData/Chocolatey/bin/gfortran.exe" -DCMAKE_Fortran_COMPILER=$FC ..
-          cmake --build .
+          pip install find_libpython delvewheel
+          python setup.py bdist_wheel
+          mv ./dist ./old
+          delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
         env:
           FC: gfortran
+          CFML_OVERRIDE: '-G"MinGW Makefiles" -DCMAKE_Fortran_COMPILER="C:/ProgramData/Chocolatey/bin/gfortran.exe"'
         
 #       - uses: msys2/setup-msys2@v2
 #         with:
