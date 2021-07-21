@@ -116,7 +116,7 @@ jobs:
           mkdir build
           cd build
           which python
-          cmake -DUSE_HDF=off -DGUI=off -DPYTHON_API=on -DCMAKE_Fortran_COMPILER=$FC ..
+          cmake -DUSE_HDF=off -DGUI=off -DPYTHON_API=on -G"MinGW Makefiles" -DCMAKE_Fortran_COMPILER="C:/ProgramData/Chocolatey/bin/gfortran.exe" -DCMAKE_Fortran_COMPILER=$FC ..
           cmake --build .
         env:
           FC: gfortran
