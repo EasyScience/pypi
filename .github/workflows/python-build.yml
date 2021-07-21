@@ -119,7 +119,7 @@ jobs:
           cmake -DUSE_HDF=off -DGUI=off -DPYTHON_API=on -DCMAKE_Fortran_COMPILER=$FC ..
           cmake --build .
         env:
-          FC: gfortran-8
+          FC: gfortran
         
 #       - uses: msys2/setup-msys2@v2
 #         with:
