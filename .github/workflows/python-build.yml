@@ -99,24 +99,43 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: CrysFML_SRC
-          
-      - uses: msys2/setup-msys2@v2
+  
+      - uses: conda-incubator/setup-miniconda@v2
         with:
-          msystem: MSYS
-          install: cmake mingw-w64-x86_64-toolchain
-          update: true
-          path-type: inherit
-
-      - name: Build CFML
-        shell: msys2 {0}
-        id: build
+          miniconda-version: "latest"
+          activate-environment: foo
+          python-version: ${{ matrix.python-version }}
+      - name: Conda info
+        shell: bash -l {0}
         run: |
-          pip install wheel delvewheel
-          pip wheel ./ --no-deps -w ./old/
-          delvewheel show ./old/*.whl
-          delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
+          conda info
+          conda list
+          which gfortran-8
+          mkdir build
+          cd build
+          which python
+          cmake -DUSE_HDF=off -DGUI=off -DPYTHON_API=on -DCMAKE_Fortran_COMPILER=$FC ..
+          cmake --build .
         env:
-          MINGW_ARCH: MINGW64
+          FC: gfortran-8
+        
+#       - uses: msys2/setup-msys2@v2
+#         with:
+#           msystem: MSYS
+#           install: cmake mingw-w64-x86_64-toolchain
+#           update: true
+#           path-type: inherit
+
+#       - name: Build CFML
+#         shell: msys2 {0}
+#         id: build
+#         run: |
+#           pip install wheel delvewheel
+#           pip wheel ./ --no-deps -w ./old/
+#           delvewheel show ./old/*.whl
+#           delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
+#         env:
+#           MINGW_ARCH: MINGW64
 
       - uses: actions/upload-artifact@v2
         with:
