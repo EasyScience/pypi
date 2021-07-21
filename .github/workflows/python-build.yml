@@ -115,7 +115,6 @@ jobs:
           delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
         env:
           FC: gfortran
-          CMAKE_GENERATOR: 'MinGW Makefiles'
           CMAKE_Fortran_COMPILER: '"C:/ProgramData/Chocolatey/bin/gfortran.exe"'
         
 #       - uses: msys2/setup-msys2@v2
