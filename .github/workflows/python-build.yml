@@ -29,67 +29,67 @@ jobs:
         retention-days: 1
 
 
-  create-Linux:
-    runs-on: ubuntu-latest
+#   create-Linux:
+#     runs-on: ubuntu-latest
 
-    needs: get_Latest
+#     needs: get_Latest
 
-    steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: CrysFML_SRC
+#     steps:
+#     - uses: actions/download-artifact@v2
+#       with:
+#         name: CrysFML_SRC
 
-    - name: Build manylinux wheels
-      run:  |
-        chmod +x ./Scripts/buildscript.sh
-        docker run -e PLAT=manylinux2010_x86_64 -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
-    - uses: actions/upload-artifact@v2
-      with:
-        name: CrysFML - Linux
-        path: ${{ github.workspace }}/dist/*.whl
+#     - name: Build manylinux wheels
+#       run:  |
+#         chmod +x ./Scripts/buildscript.sh
+#         docker run -e PLAT=manylinux2010_x86_64 -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
+#     - uses: actions/upload-artifact@v2
+#       with:
+#         name: CrysFML - Linux
+#         path: ${{ github.workspace }}/dist/*.whl
 
-  create-OSX:
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: ['3.8']
-        os: [macos-10.15]
-        gcc_v: [ 10 ] # Version of GFortran we want to use.
+#   create-OSX:
+#     strategy:
+#       max-parallel: 4
+#       matrix:
+#         python-version: ['3.8']
+#         os: [macos-10.15]
+#         gcc_v: [ 10 ] # Version of GFortran we want to use.
 
-    runs-on: ${{ matrix.os }}
+#     runs-on: ${{ matrix.os }}
 
-    needs: get_Latest
+#     needs: get_Latest
 
-    steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: CrysFML_SRC
+#     steps:
+#     - uses: actions/download-artifact@v2
+#       with:
+#         name: CrysFML_SRC
 
-    - name: Setup python
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{matrix.python-version}}
+#     - name: Setup python
+#       uses: actions/setup-python@v1
+#       with:
+#         python-version: ${{matrix.python-version}}
 
-    - name: Install cmake
-      run: pip3 install cmake delocate wheel
+#     - name: Install cmake
+#       run: pip3 install cmake delocate wheel
 
-    - name: Build CFML (OSX)
-      env:
-        FC: gfortran-${{ matrix.gcc_v }}
-        CC: gcc-${{ matrix.gcc_v }}
-      run: |
-        pip3 wheel ./ --no-deps -w ./old/
-        delocate-wheel -w dist -v ./old/*.whl
-    - uses: actions/upload-artifact@v2
-      with:
-        name: CrysFML - MacOS
-        path: ./dist/*.whl
+#     - name: Build CFML (OSX)
+#       env:
+#         FC: gfortran-${{ matrix.gcc_v }}
+#         CC: gcc-${{ matrix.gcc_v }}
+#       run: |
+#         pip3 wheel ./ --no-deps -w ./old/
+#         delocate-wheel -w dist -v ./old/*.whl
+#     - uses: actions/upload-artifact@v2
+#       with:
+#         name: CrysFML - MacOS
+#         path: ./dist/*.whl
 
   create-Windows:
     strategy:
       max-parallel: 1
       matrix:
-        python-version: [ '3.7' ]
+        python-version: [ '3.6', '3.7' ]
         os: [ windows-latest ]
 
     runs-on: ${{ matrix.os }}
@@ -123,19 +123,19 @@ jobs:
           name: CrysFML - Windows
           path: ./dist/*.whl
 
-  Upload_Artifacts:
-    runs-on: ubuntu-latest
-    needs: [create-Linux, create-OSX, create-Windows]
-    steps:
-    - uses: actions/download-artifact@v2
-    - name: Upload Artifacts GitHub releases
-      uses: ncipollo/release-action@v1
-      with:
-        draft: false
-        prerelease: true
-        allowUpdates: true
-        replacesArtifacts: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "./**/*.whl"
-        tag: "CurrentBuild"
-        body: "This is a build of the CFML libraries."
+#   Upload_Artifacts:
+#     runs-on: ubuntu-latest
+#     needs: [create-Linux, create-OSX, create-Windows]
+#     steps:
+#     - uses: actions/download-artifact@v2
+#     - name: Upload Artifacts GitHub releases
+#       uses: ncipollo/release-action@v1
+#       with:
+#         draft: false
+#         prerelease: true
+#         allowUpdates: true
+#         replacesArtifacts: true
+#         token: ${{ secrets.GITHUB_TOKEN }}
+#         artifacts: "./**/*.whl"
+#         tag: "CurrentBuild"
+#         body: "This is a build of the CFML libraries."
