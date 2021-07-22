@@ -87,9 +87,9 @@ jobs:
 
   create-Windows:
     strategy:
-      max-parallel: 1
+      max-parallel: 4
       matrix:
-        python-version: [ '3.6', '3.7', '3.8', '3.9']
+        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
         os: [ windows-latest ]
 
     runs-on: ${{ matrix.os }}
@@ -110,8 +110,7 @@ jobs:
         run: |
           conda install -c conda-forge fortran-compiler
           pip install find_libpython delvewheel
-          python setup.py bdist_wheel
-          mv ./dist ./old
+          pip wheel ./ --no-deps -w ./old/
           delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
         env:
           FC: gfortran
