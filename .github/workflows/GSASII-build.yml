@@ -54,9 +54,9 @@ jobs:
       - name: Conda build
         shell: bash -l {0}
         run: |
-          ls
-          conda install -c scons
-          cd  ./pyGSAS/trunk/fsource
+          conda config --env --set always_yes true
+          conda install -c conda-forge scons
+          cd  fsource
           scons
           cd ../
           rm -rf bindist
