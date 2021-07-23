@@ -6,9 +6,9 @@ on:
   pull_request:
     branches: [ GSASII ]
 
-  schedule:
-  # Every day at 1am
-  - cron: '0 1 * * *'
+#   schedule:
+#   # Every day at 1am
+#   - cron: '0 1 * * *'
 
 jobs:
 
@@ -19,7 +19,7 @@ jobs:
     steps:
     - name: Checkout ANL repo
       run: |
-        apt-get install subversion
+        sudo apt-get install subversion
         svn checkout --depth empty https://subversion.xray.aps.anl.gov/pyGSAS/
         cd pyGSAS
         svn update trunk
