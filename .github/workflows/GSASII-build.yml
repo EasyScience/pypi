@@ -42,6 +42,8 @@ jobs:
     needs: get_Latest
     
     steps:
+      - name: Check-out repository
+        uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: GSASII_SRC
@@ -61,7 +63,20 @@ jobs:
           cd ../
           rm -rf bindist
           mv ./bin ./bindist
-
+          
+      - name: Fixup library names
+        run: |
+          for n1 in ./bin/*.so ; do
+             export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
+            mv ${n1} ${n2}
+          done
+          
+      - name: Make packaging structure
+        run: |
+          mkdir GSASII
+          mv $(ls -1 . | grep -v -w GSASII) ./GSASII/
+          mv GSASII.py ./GSASII
+        
       - uses: actions/upload-artifact@v2
         with:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
