@@ -55,7 +55,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda config --env --set always_yes true
-          conda install -c conda-forge scons
+          conda install numpy scons
           cd  fsource
           scons
           cd ../
