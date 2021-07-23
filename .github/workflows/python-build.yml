@@ -2,9 +2,9 @@ name: Python libs
 
 on:
   push:
-    branches: [ CFML ]
+    branches: [ GSASII ]
   pull_request:
-    branches: [ CFML ]
+    branches: [ GSASII ]
 
   schedule:
   # Every day at 1am
@@ -17,85 +17,26 @@ jobs:
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     steps:
-    - name: Checkout ILL repo
+    - name: Checkout ANL repo
       run: |
-        git clone https://code.ill.fr/scientific-software/crysfml/ ./
-        git checkout feature-python_api-build_wheels
-        rm -rf ./.git ./Html
+        apt-get install subversion
+        svn checkout --depth empty https://subversion.xray.aps.anl.gov/pyGSAS/
+        cd pyGSAS
+        svn update trunk
+        cd trunk
     - uses: actions/upload-artifact@v2
       with:
-        name: CrysFML_SRC
-        path: ${{ github.workspace }}
+        name: GSASII_SRC
+        path: ${{ github.workspace }}/pyGSAS/trunk
         retention-days: 1
 
 
   create-Linux:
-    runs-on: ubuntu-latest
-
-    needs: get_Latest
-
-    steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: CrysFML_SRC
-
-    - name: Build manylinux wheels
-      run:  |
-        chmod +x ./Scripts/buildscript.sh
-        docker run -e PLAT=manylinux2010_x86_64 -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2010_x86_64 /io/Scripts/buildscript.sh
-    - uses: actions/upload-artifact@v2
-      with:
-        name: CrysFML - Linux
-        path: ${{ github.workspace }}/dist/*.whl
-
-  create-OSX:
     strategy:
-      max-parallel: 4
+      max-parallel: 1
       matrix:
-        python-version: ['3.8']
-        os: [macos-10.15]
-        gcc_v: [ 10 ] # Version of GFortran we want to use.
-
-    runs-on: ${{ matrix.os }}
-
-    needs: get_Latest
-
-    steps:
-    - uses: actions/download-artifact@v2
-      with:
-        name: CrysFML_SRC
-
-    - name: Setup python
-      uses: actions/setup-python@v1
-      with:
-        python-version: ${{matrix.python-version}}
-
-    - name: Install cmake
-      run: pip3 install cmake delocate wheel
-
-    - name: Build CFML (OSX)
-      env:
-        FC: gfortran-${{ matrix.gcc_v }}
-        CC: gcc-${{ matrix.gcc_v }}
-      run: |
-        pip3 wheel ./ --no-deps -w ./old/
-        delocate-wheel -w dist -v ./old/*.whl
-        for n1 in ./dist/*.whl ; do
-          n2=$( echo ${n1} | sed -e 's/10_15/10_13/g' )
-          mv ${n1} ${n2}
-        done
-
-    - uses: actions/upload-artifact@v2
-      with:
-        name: CrysFML - MacOS
-        path: ./dist/*.whl
-
-  create-Windows:
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
-        os: [ windows-latest ]
+        python-version: [ '3.8' ]
+        os: [ ubuntu-latest ]
 
     runs-on: ${{ matrix.os }}
     needs: get_Latest
@@ -103,7 +44,7 @@ jobs:
     steps:
       - uses: actions/download-artifact@v2
         with:
-          name: CrysFML_SRC
+          name: GSASII_SRC
   
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -113,33 +54,32 @@ jobs:
       - name: Conda build
         shell: bash -l {0}
         run: |
-          conda install -c conda-forge fortran-compiler
-          pip install find_libpython delvewheel
-          pip wheel ./ --no-deps -w ./old/
-          delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
-        env:
-          FC: gfortran
-          CMAKE_GENERATOR: MinGW Makefiles
-          FLIP_SLASHES: True
+          ls
+          conda install -c scons
+          cd  ./pyGSAS/trunk/fsource
+          scons
+          cd ../
+          rm -rf bindist
+          mv ./bin ./bindist
 
       - uses: actions/upload-artifact@v2
         with:
-          name: CrysFML - Windows - Python ${{ matrix.python-version }}
-          path: ./dist/*.whl
+          name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+          path: ${{ github.workspace }}
 
-  Upload_Artifacts:
-    runs-on: ubuntu-latest
-    needs: [create-Linux, create-OSX, create-Windows]
-    steps:
-    - uses: actions/download-artifact@v2
-    - name: Upload Artifacts GitHub releases
-      uses: ncipollo/release-action@v1
-      with:
-        draft: false
-        prerelease: true
-        allowUpdates: true
-        replacesArtifacts: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "./**/*.whl"
-        tag: "CFML"
-        body: "This is a build of the CFML libraries."
+#   Upload_Artifacts:
+#     runs-on: ubuntu-latest
+#     needs: [create-Linux, create-OSX, create-Windows]
+#     steps:
+#     - uses: actions/download-artifact@v2
+#     - name: Upload Artifacts GitHub releases
+#       uses: ncipollo/release-action@v1
+#       with:
+#         draft: false
+#         prerelease: true
+#         allowUpdates: true
+#         replacesArtifacts: true
+#         token: ${{ secrets.GITHUB_TOKEN }}
+#         artifacts: "./**/*.whl"
+#         tag: "CFML"
+#         body: "This is a build of the CFML libraries."
