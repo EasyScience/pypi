@@ -2,9 +2,9 @@ name: Python libs
 
 on:
   push:
-    branches: [ master ]
+    branches: [ CFML ]
   pull_request:
-    branches: [ master ]
+    branches: [ CFML ]
 
   schedule:
   # Every day at 1am
@@ -80,6 +80,11 @@ jobs:
       run: |
         pip3 wheel ./ --no-deps -w ./old/
         delocate-wheel -w dist -v ./old/*.whl
+        for n1 in ./dist/*.whl ; do
+          n2=$( echo ${n1} | sed -e 's/10_15/10_13/g' )
+          mv ./dist/${n1} ./dist/${n2}
+        done
+
     - uses: actions/upload-artifact@v2
       with:
         name: CrysFML - MacOS
@@ -136,5 +141,5 @@ jobs:
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
         artifacts: "./**/*.whl"
-        tag: "CurrentBuild"
+        tag: "CFML"
         body: "This is a build of the CFML libraries."
