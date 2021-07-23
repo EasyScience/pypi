@@ -66,7 +66,7 @@ jobs:
           
       - name: Fixup library names
         run: |
-          for n1 in ./bin/*.so ; do
+          for n1 in ./bindist/*.so ; do
              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
             mv ${n1} ${n2}
           done
