@@ -82,7 +82,7 @@ jobs:
         delocate-wheel -w dist -v ./old/*.whl
         for n1 in ./dist/*.whl ; do
           n2=$( echo ${n1} | sed -e 's/10_15/10_13/g' )
-          mv ./dist/${n1} ./dist/${n2}
+          mv ${n1} ${n2}
         done
 
     - uses: actions/upload-artifact@v2
