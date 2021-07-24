@@ -94,6 +94,22 @@ jobs:
           cd ${{ github.workspace }}
           mv __init__.py ./GSASII/
           rm -rf .git .github
+          
+      - name: Build Wheel
+        shell: bash -l {0}
+        if: matrix.os == 'macOS-latest'
+        run: |
+          pip install delocate
+          python setup.py bdist_wheel --dist-dir=old
+          delocate-wheel -w dist -v old/*.whl
+
+      - name: Build Wheel
+        shell: bash -l {0}
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          pip install auditwheel
+          python setup.py bdist_wheel
+          auditwheel repair bdist/*.whl
         
       - uses: actions/upload-artifact@v2
         with:
