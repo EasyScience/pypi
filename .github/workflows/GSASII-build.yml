@@ -31,7 +31,7 @@ jobs:
         retention-days: 1
 
 
-  create-Linux:
+  create-GSASII:
     strategy:
       max-parallel: 1
       matrix:
@@ -42,12 +42,14 @@ jobs:
     needs: get_Latest
     
     steps:
+    
+      - name: Check-out repository
+        uses: actions/checkout@v2
+        
       - uses: actions/download-artifact@v2
         with:
           name: GSASII_SRC
-  
-      - name: Check-out repository
-        uses: actions/checkout@v2
+          path: GSASII
   
       - uses: conda-incubator/setup-miniconda@v2
         with:
@@ -59,7 +61,7 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install numpy scons -y 
-          cd  fsource
+          cd  GSASII/fsource
           
       - name: Conda build
         shell: bash -l {0}
@@ -83,9 +85,9 @@ jobs:
           
       - name: Make packaging structure
         run: |
-          mkdir GSASII
-          mv $(ls -1 . | grep -v -w GSASII) ./GSASII/
-          mv GSASII.py ./GSASII
+          cd ${{ github.workspace }}
+          mv __init__.py ./GSASII/
+          rm -rf .git .github
         
       - uses: actions/upload-artifact@v2
         with:
