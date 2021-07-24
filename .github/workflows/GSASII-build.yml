@@ -68,7 +68,7 @@ jobs:
         run: |
           which gfortran-10 
           cd  ${{ github.workspace }}/GSASII/fsource
-          scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' FCompiler='gfortran-10'
+          scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' FCompiler='gfortran-10' FORTpath=/usr/local/bin/
         env:
           SDKROOT: ''
 
@@ -133,15 +133,15 @@ jobs:
       - name: Conda build
         shell: bash -l {0}
         run: |
-          cd  ${{ github.workspace }}/GSASII/fsource
+          cd  ${{ github.workspace }}\GSASII\fsource
           scons
 
       - name: Fixup library names
         run: |
-          cd  ${{ github.workspace }}/GSASII
+          cd  ${{ github.workspace }}\GSASII
           rm -rf bindist
           mv ./bin ./bindist
-          for n1 in bindist/*.so ; do
+          for n1 in bindist/*.pyd ; do
              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
             mv ${n1} ${n2}
           done
@@ -157,10 +157,10 @@ jobs:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
           path: ${{ github.workspace }}
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: CrysFML - Windows - Python ${{ matrix.python-version }}
-          path: ./dist/*.whl
+#       - uses: actions/upload-artifact@v2
+#         with:
+#           name: CrysFML - Windows - Python ${{ matrix.python-version }}
+#           path: ./dist/*.whl
 
 #   Upload_Artifacts:
 #     runs-on: ubuntu-latest
