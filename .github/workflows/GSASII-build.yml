@@ -33,7 +33,7 @@ jobs:
 
   create-GSASII:
     strategy:
-      max-parallel: 1
+      max-parallel: 2
       matrix:
         python-version: [ '3.8' ]
         os: [ ubuntu-latest, macOS-latest ]
@@ -66,8 +66,9 @@ jobs:
         shell: bash -l {0}
         if: matrix.os == 'macOS-latest'
         run: |
+          ls /Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/ 
           cd  ${{ github.workspace }}/GSASII/fsource
-          scons LDFLAGS='-undefined dynamic_lookup -bundle -arch x86_64 -m64 -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' 
+          scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' 
         env:
           SDKROOT: ''
 
@@ -98,6 +99,69 @@ jobs:
         with:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
           path: ${{ github.workspace }}
+          
+  create-Windows:
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+        os: [ windows-latest ]
+
+    runs-on: ${{ matrix.os }}
+    needs: get_Latest
+    
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v2
+        
+      - uses: actions/download-artifact@v2
+        with:
+          name: GSASII_SRC
+          path: GSASII
+  
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          miniconda-version: "latest"
+          activate-environment: foo
+          python-version: ${{ matrix.python-version }}
+          
+      - name: Conda pre-build
+        shell: bash -l {0}
+        run: |
+          conda install -c conda-forge fortran-compiler numpy scons -y
+          
+      - name: Conda build
+        shell: bash -l {0}
+        if: matrix.os == 'ubuntu-latest'
+        run: |
+          cd  ${{ github.workspace }}/GSASII/fsource
+          scons
+
+      - name: Fixup library names
+        run: |
+          cd  ${{ github.workspace }}/GSASII
+          rm -rf bindist
+          mv ./bin ./bindist
+          for n1 in bindist/*.so ; do
+             export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
+            mv ${n1} ${n2}
+          done
+          
+      - name: Make packaging structure
+        run: |
+          cd ${{ github.workspace }}
+          mv __init__.py ./GSASII/
+          rm -rf .git .github
+        
+      - uses: actions/upload-artifact@v2
+        with:
+          name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+          path: ${{ github.workspace }}
+
+      - uses: actions/upload-artifact@v2
+        with:
+          name: CrysFML - Windows - Python ${{ matrix.python-version }}
+          path: ./dist/*.whl
 
 #   Upload_Artifacts:
 #     runs-on: ubuntu-latest
