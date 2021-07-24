@@ -68,6 +68,8 @@ jobs:
         run: |
           cd  ${{ github.workspace }}/GSASII/fsource
           scons LDFLAGS='-undefined dynamic_lookup -bundle -arch x86_64 -m64 -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' 
+        env:
+          SDKROOT: ''
 
       - name: Conda build
         shell: bash -l {0}
