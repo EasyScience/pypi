@@ -36,37 +36,47 @@ jobs:
       max-parallel: 1
       matrix:
         python-version: [ '3.8' ]
-        os: [ ubuntu-latest ]
+        os: [ ubuntu-latest, macOS-latest ]
 
     runs-on: ${{ matrix.os }}
     needs: get_Latest
     
     steps:
-      - name: Check-out repository
-        uses: actions/checkout@v2
       - uses: actions/download-artifact@v2
         with:
           name: GSASII_SRC
+  
+      - name: Check-out repository
+        uses: actions/checkout@v2
   
       - uses: conda-incubator/setup-miniconda@v2
         with:
           miniconda-version: "latest"
           activate-environment: foo
           python-version: ${{ matrix.python-version }}
-      - name: Conda build
+          
+      - name: Conda pre-build
         shell: bash -l {0}
         run: |
-          conda config --env --set always_yes true
-          conda install numpy scons
+          conda install numpy scons -y 
           cd  fsource
-          scons
+          
+      - name: Conda build
+        shell: bash -l {0}
+        if: matrix.os == 'macOS-latest'
+        run: scons LDFLAGS='-undefined dynamic_lookup -bundle -arch x86_64 -m64 -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' 
+
+      - name: Conda build
+        shell: bash -l {0}
+        if: matrix.os == 'ubuntu-latest'
+        run: scons
+
+      - name: Fixup library names
+        run: |
           cd ../
           rm -rf bindist
           mv ./bin ./bindist
-          
-      - name: Fixup library names
-        run: |
-          for n1 in ./bindist/*.so ; do
+          for n1 in bindist/*.so ; do
              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
             mv ${n1} ${n2}
           done
