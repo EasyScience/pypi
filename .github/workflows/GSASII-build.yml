@@ -66,9 +66,9 @@ jobs:
         shell: bash -l {0}
         if: matrix.os == 'macOS-latest'
         run: |
-          which gfortran-10 
+          sudo ln -s /usr/local/bin/gfortran-10 /usr/local/bin/gfortran
           cd  ${{ github.workspace }}/GSASII/fsource
-          scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' FCompiler='gfortran-10' FORTpath=/usr/local/bin/
+          scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' FCompiler='gfortran' FORTpath=/usr/local/bin/
         env:
           SDKROOT: ''
 
@@ -133,12 +133,12 @@ jobs:
       - name: Conda build
         shell: bash -l {0}
         run: |
-          cd  ${{ github.workspace }}\GSASII\fsource
+          cd  GSASII/fsource
           scons
 
       - name: Fixup library names
         run: |
-          cd  ${{ github.workspace }}\GSASII
+          cd  ../
           rm -rf bindist
           mv ./bin ./bindist
           for n1 in bindist/*.pyd ; do
@@ -148,7 +148,7 @@ jobs:
           
       - name: Make packaging structure
         run: |
-          cd ${{ github.workspace }}
+          cd ../
           mv __init__.py ./GSASII/
           rm -rf .git .github
         
