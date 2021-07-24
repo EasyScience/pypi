@@ -61,21 +61,24 @@ jobs:
         shell: bash -l {0}
         run: |
           conda install numpy scons -y 
-          cd  GSASII/fsource
           
       - name: Conda build
         shell: bash -l {0}
         if: matrix.os == 'macOS-latest'
-        run: scons LDFLAGS='-undefined dynamic_lookup -bundle -arch x86_64 -m64 -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' 
+        run: |
+          cd  ${{ github.workspace }}/GSASII/fsource
+          scons LDFLAGS='-undefined dynamic_lookup -bundle -arch x86_64 -m64 -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' 
 
       - name: Conda build
         shell: bash -l {0}
         if: matrix.os == 'ubuntu-latest'
-        run: scons
+        run: |
+          cd  ${{ github.workspace }}/GSASII/fsource
+          scons
 
       - name: Fixup library names
         run: |
-          cd ../
+          cd  ${{ github.workspace }}/GSASII
           rm -rf bindist
           mv ./bin ./bindist
           for n1 in bindist/*.so ; do
