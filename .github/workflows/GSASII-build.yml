@@ -88,6 +88,8 @@ jobs:
              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
             mv ${n1} ${n2}
           done
+          rm fsource/*.so
+          rm fsource/*.a
           
       - name: Make packaging structure
         run: |
@@ -100,7 +102,7 @@ jobs:
         if: matrix.os == 'macOS-latest'
         run: |
           pip install delocate
-          python setup.py bdist_wheel --dist-dir=old
+          pip wheel ./ --no-deps -w ./old/
           delocate-wheel -w dist -v old/*.whl
 
       - name: Build Wheel
