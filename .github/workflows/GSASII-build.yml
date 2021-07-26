@@ -173,7 +173,6 @@ jobs:
       - name: Make packaging structure
         run: |
           mv __init__.py ./GSASII/
-          rm -rf .git .github
           
       - name: Build Wheel
         run: |
