@@ -1,5 +1,24 @@
 from setuptools import setup
 
+
+try:
+    from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
+    # this overrides standard naming of the wheel to not include
+    # architecture or python dot version number
+
+    class Bdist_wheel(_bdist_wheel):
+        def finalize_options(self):
+            _bdist_wheel.finalize_options(self)
+            self.root_is_pure = False
+
+        def get_tag(self):
+            python, abi, plat = _bdist_wheel.get_tag(self)
+            if platform.system() != 'Windows':
+                python, abi = 'py3', 'none'
+            return python, abi, plat
+except ImportError:
+    Bdist_wheel = None
+
 setup(
     name='GSASII',
     version='0.0.1',
@@ -13,4 +32,7 @@ setup(
     package_data={
         'GSASII': ['*'],
     },
+    cmdclass={
+        'bdist_wheel':     Bdist_wheel
+    }
 )
