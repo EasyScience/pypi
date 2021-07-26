@@ -23,20 +23,48 @@ jobs:
         svn checkout --depth empty https://subversion.xray.aps.anl.gov/pyGSAS/
         cd pyGSAS
         svn update trunk
-        cd trunk
+        svn update Binaries
     - uses: actions/upload-artifact@v2
       with:
         name: GSASII_SRC
         path: ${{ github.workspace }}/pyGSAS/trunk
         retention-days: 1
 
-
-  create-GSASII:
+    - uses: actions/upload-artifact@v2
+      with:
+        name: GSASII_BIN
+        path: ${{ github.workspace }}/pyGSAS/Binaries
+        retention-days: 1
+        
+  create-Linux:
+    runs-on: ubuntu-latest
+    needs: get_Latest
+    
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v2
+        
+      - uses: actions/download-artifact@v2
+        with:
+          name: GSASII_SRC
+          path: GSASII
+  
+      - name: Build manylinux wheels
+        run:  |
+          chmod +x manylinux_build.sh
+          docker run -e PLAT=manylinux2010_x86_64 -v ${{ github.workspace }}:/io quay.io/pypa/manylinux2010_x86_64 /io/manylinux_build.sh  
+          
+      - uses: actions/upload-artifact@v2
+        with:
+          name: GSAS-II - Manylinux
+          path: ${{ github.workspace }}/dist
+  
+  create-OSX:
     strategy:
       max-parallel: 2
       matrix:
         python-version: [ '3.8' ]
-        os: [ ubuntu-latest, macOS-latest ]
+        os: [ macOS-latest ]
 
     runs-on: ${{ matrix.os }}
     needs: get_Latest
@@ -64,20 +92,12 @@ jobs:
           
       - name: Conda build
         shell: bash -l {0}
-        if: matrix.os == 'macOS-latest'
         run: |
           sudo ln -s /usr/local/bin/gfortran-10 /usr/local/bin/gfortran
           cd  ${{ github.workspace }}/GSASII/fsource
           scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' FCompiler='gfortran' FORTpath=/usr/local/bin/
         env:
           SDKROOT: ''
-
-      - name: Conda build
-        shell: bash -l {0}
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          cd  ${{ github.workspace }}/GSASII/fsource
-          scons
 
       - name: Fixup library names
         run: |
@@ -104,76 +124,68 @@ jobs:
           pip install delocate
           pip wheel ./ --no-deps -w ./old/
           delocate-wheel -w dist -v old/*.whl
-
-      - name: Build Wheel
-        shell: bash -l {0}
-        if: matrix.os == 'ubuntu-latest'
-        run: |
-          pip install auditwheel
-          python setup.py bdist_wheel
-          auditwheel repair bdist/*.whl
         
       - uses: actions/upload-artifact@v2
         with:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
           path: ${{ github.workspace }}
           
-  create-Windows:
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [ '3.6', '3.7', '3.8', '3.9' ]
-        os: [ windows-latest ]
+#   create-Windows:
+#     strategy:
+#       max-parallel: 4
+#       matrix:
+#         python-version: [ '3.6', '3.7', '3.8', '3.9' ]
+#         os: [ windows-latest ]
 
-    runs-on: ${{ matrix.os }}
-    needs: get_Latest
+#     runs-on: ${{ matrix.os }}
+#     needs: get_Latest
     
-    steps:
-      - name: Check-out repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Check-out repository
+#         uses: actions/checkout@v2
         
-      - uses: actions/download-artifact@v2
-        with:
-          name: GSASII_SRC
-          path: GSASII
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: GSASII_SRC
+#           path: GSASII
   
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          miniconda-version: "latest"
-          activate-environment: foo
-          python-version: ${{ matrix.python-version }}
+#       - uses: conda-incubator/setup-miniconda@v2
+#         with:
+#           miniconda-version: "latest"
+#           activate-environment: foo
+#           python-version: ${{ matrix.python-version }}
           
-      - name: Conda pre-build
-        shell: bash -l {0}
-        run: |
-          conda install -c conda-forge fortran-compiler numpy scons -y
+#       - name: Conda pre-build
+#         shell: bash -l {0}
+#         run: |
+#           conda install -c conda-forge fortran-compiler numpy scons -y
           
-      - name: Conda build
-        shell: bash -l {0}
-        run: |
-          cd  GSASII/fsource
-          scons
+#       - name: Conda build
+#         shell: bash -l {0}
+#         run: |
+#           cd  GSASII/fsource
+#           scons
 
-      - name: Fixup library names
-        run: |
-          cd  ../
-          rm -rf bindist
-          mv ./bin ./bindist
-          for n1 in bindist/*.pyd ; do
-             export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
-            mv ${n1} ${n2}
-          done
+#       - name: Fixup library names
+#         run: |
+#           cd  ../
+#           rm -rf bindist
+#           mv ./bin ./bindist
+#           for n1 in bindist/*.pyd ; do
+#              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
+#             mv ${n1} ${n2}
+#           done
           
-      - name: Make packaging structure
-        run: |
-          cd ../
-          mv __init__.py ./GSASII/
-          rm -rf .git .github
+#       - name: Make packaging structure
+#         run: |
+#           cd ../
+#           mv __init__.py ./GSASII/
+#           rm -rf .git .github
         
-      - uses: actions/upload-artifact@v2
-        with:
-          name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
-          path: ${{ github.workspace }}
+#       - uses: actions/upload-artifact@v2
+#         with:
+#           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+#           path: ${{ github.workspace }}
 
 #       - uses: actions/upload-artifact@v2
 #         with:
