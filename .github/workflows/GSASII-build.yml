@@ -153,8 +153,13 @@ jobs:
         with:
           name: GSASII_BIN
           path: bin
-          
+      
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+        
       - name: Copy pre-compiled libs
+        shell: bash
         run: |
           export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.15
           echo $LIB_DIR
