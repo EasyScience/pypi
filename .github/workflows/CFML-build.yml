@@ -20,7 +20,8 @@ jobs:
     - name: Checkout ILL repo
       run: |
         git clone https://code.ill.fr/scientific-software/crysfml/ ./
-        git checkout feature-python_api-build_wheels
+        # WE ARE NOW USING MASTER BRANCH
+        # git checkout feature-python_api-build_wheels
         rm -rf ./.git ./Html
     - uses: actions/upload-artifact@v2
       with:
