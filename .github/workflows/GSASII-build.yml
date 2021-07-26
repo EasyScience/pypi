@@ -33,7 +33,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: GSASII_BIN
-        path: ${{ github.workspace }}/pyGSAS/Binaries/win_64*
+        path: ${{ github.workspace }}/pyGSAS/Binaries/win_64_p3*
         retention-days: 1
         
   create-Linux:
@@ -158,7 +158,7 @@ jobs:
         run: |
           export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.15
           echo $LIB_DIR
-          if [ ! -d $LIB_DIR ] 
+          if [ ! -d "$LIB_DIR" ] 
           then
               export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.19
               echo $LIB_DIR
