@@ -17,7 +17,7 @@ function repair_wheel {
 export PYBIN=/opt/python/cp38-cp38/bin
 
 
-"${PYBIN}/pip" install numpy scons --yes
+"${PYBIN}/pip" install numpy scons
 mv /io/__init__.py /io/GSASII/
 cd /io/GSASII/fsource
 scons
