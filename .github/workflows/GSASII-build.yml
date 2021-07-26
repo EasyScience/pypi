@@ -176,6 +176,7 @@ jobs:
           
       - name: Build Wheel
         run: |
+          pip install wheel
           pip wheel ./ --no-deps -w ./dist
         
       - uses: actions/upload-artifact@v2
