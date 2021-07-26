@@ -33,7 +33,7 @@ jobs:
     - uses: actions/upload-artifact@v2
       with:
         name: GSASII_BIN
-        path: ${{ github.workspace }}/pyGSAS/Binaries
+        path: ${{ github.workspace }}/pyGSAS/Binaries/win_64*
         retention-days: 1
         
   create-Linux:
@@ -128,26 +128,56 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
-          path: ${{ github.workspace }}
+          path: ${{ github.workspace }}/dist
           
-#   create-Windows:
-#     strategy:
-#       max-parallel: 4
-#       matrix:
-#         python-version: [ '3.6', '3.7', '3.8', '3.9' ]
-#         os: [ windows-latest ]
+  create-Windows:
+    strategy:
+      max-parallel: 4
+      matrix:
+        python-version: [ '3.6', '3.7', '3.8' ]
+        os: [ windows-latest ]
 
-#     runs-on: ${{ matrix.os }}
-#     needs: get_Latest
+    runs-on: ${{ matrix.os }}
+    needs: get_Latest
     
-#     steps:
-#       - name: Check-out repository
-#         uses: actions/checkout@v2
+    steps:
+      - name: Check-out repository
+        uses: actions/checkout@v2
         
-#       - uses: actions/download-artifact@v2
-#         with:
-#           name: GSASII_SRC
-#           path: GSASII
+      - uses: actions/download-artifact@v2
+        with:
+          name: GSASII_SRC
+          path: GSASII
+  
+      - uses: actions/download-artifact@v2
+        with:
+          name: GSASII_BIN
+          path: bin
+          
+      - name: Copy pre-compiled libs
+        run: |
+          export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.15
+          echo $LIB_DIR
+          if [ ! -d $LIB_DIR ] 
+          then
+              export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.19
+              echo $LIB_DIR
+          fi
+          mv $LIB_DIR GSASII/bindist
+          
+      - name: Make packaging structure
+        run: |
+          mv __init__.py ./GSASII/
+          rm -rf .git .github
+          
+      - name: Build Wheel
+        run: |
+          pip wheel ./ --no-deps -w ./dist
+        
+      - uses: actions/upload-artifact@v2
+        with:
+          name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+          path: ${{ github.workspace }}/dist
   
 #       - uses: conda-incubator/setup-miniconda@v2
 #         with:
