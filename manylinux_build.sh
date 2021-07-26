@@ -14,7 +14,10 @@ function repair_wheel {
 # Install a system package required by our library
 #yum install -y atlas-devel
 # yum install -y libaec-dev libz-dev libsz2
-pip install numpy scons --yes
+export PYBIN=/opt/python/cp38-cp38/bin
+
+
+"${PYBIN}/pip" install numpy scons --yes
 mv /io/__init__.py /io/GSASII/
 cd /io/GSASII/fsource
 scons
@@ -30,7 +33,6 @@ rm fsource/*.a
 
 # Compile wheels
 #for PYBIN in /opt/python/*/bin; do
-export PYBIN=/opt/python/cp38-cp38/bin
 "${PYBIN}/pip" wheel /io/ --no-deps --use-feature=in-tree-build -w /io/dist/
 rm -rf /io/build/
 #done
