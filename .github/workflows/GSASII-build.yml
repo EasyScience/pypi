@@ -168,7 +168,7 @@ jobs:
               export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.19
               echo $LIB_DIR
           fi
-          mv $LIB_DIR GSASII/bindist
+          mv $LIB_DIR/* GSASII/bindist/
           
       - name: Make packaging structure
         run: |
