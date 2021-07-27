@@ -22,7 +22,7 @@ for PYBIN in /opt/python/*/bin; do
   "${PYBIN}/pip" install numpy scons
   export SCONS_PATH=${PYBIN}/scons
   cd /io
-  "${PYBIN}/python" setup.py bdist_wheel
+  ${PYBIN}/python /io/setup.py bdist_wheel
   rm fsource/*.so
   rm fsource/*.a
   rm -rf /io/build/
