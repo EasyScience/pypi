@@ -1,11 +1,15 @@
 __author__ = 'github.com/wardsimon'
 __version__ = '0.0.1'
 
-import os, shutil, subprocess
+import os
+import shutil
+import subprocess
+import sys
+from distutils.command.install_data import install_data
+
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install_lib import install_lib
-from distutils.command.install_data import install_data
 
 
 class SconsExtension(Extension):
@@ -28,13 +32,15 @@ class BuildSconsLibs(build_ext):
     def build_scons(self, extension: Extension):
         print("Calling SCons to build the module")
         src_dir = os.path.join(self.build_lib, 'GSASII', 'fsource')
-        subprocess.check_call(['scons'], cwd=src_dir)
+        scons_path = [os.environ.get('SCONS_PATH', 'scons')]
+        scons_path = scons_path + scons_vars
+        subprocess.check_call(scons_path, cwd=src_dir)
         bin_dir = os.path.join(self.build_lib, 'GSASII', 'bindist')
         os.makedirs(bin_dir, exist_ok=True)
         self.distribution.bin_dir = bin_dir
 
 
-class InstallCMakeLibsData(install_data):
+class InstallSconsLibsData(install_data):
     """
     Just a wrapper to get the install data into the egg-info
     Listing the installed files in the egg-info guarantees that
@@ -49,7 +55,7 @@ class InstallCMakeLibsData(install_data):
         self.outfiles = self.distribution.data_files
 
 
-class InstallCMakeLibs(install_lib):
+class InstallSconsLibs(install_lib):
     """
     Get the libraries from the parent distribution, use those as the outfiles
     Skip building anything; everything is already built, forward libraries to
@@ -73,6 +79,16 @@ class InstallCMakeLibs(install_lib):
         self.distribution.run_command("install_data")
         super().run()
 
+
+scons_vars = []
+if "--scons_args" in sys.argv:
+    idx = sys.argv.index("--scons_args")
+    sys.argv.remove("--scons_args")
+    for opt_idx in range(idx, len(sys.argv)):
+        arg = sys.argv[opt_idx]
+        scons_vars.append(arg)
+    sys.argv = sys.argv[0:idx]
+
 setup(
     name='GSASII',
     version='0.0.1',
@@ -88,10 +104,12 @@ setup(
         'GSASII': ['*'],
     },
     cmdclass={
-        'build_ext': BuildSconsLibs,
-        'install_data':    InstallCMakeLibsData,
-        'install_lib':     InstallCMakeLibs,
+        'build_ext':    BuildSconsLibs,
+        'install_data': InstallSconsLibsData,
+        'install_lib':  InstallSconsLibs,
 
     },
-    setup_requires=['wheel', 'scons']
+    setup_requires=['setuptools', 'wheel', 'scons', 'numpy'],
+    install_requires=['numpy'],
+
 )
