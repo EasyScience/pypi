@@ -20,11 +20,11 @@ try:
 except ImportError:
     Bdist_wheel = None
 
-cmdclass = {}
-if platform.system() != 'Linux':
-    cmdclass={
-        'bdist_wheel':     Bdist_wheel
-    }
+# cmdclass = {}
+# if platform.system() != 'Linux':
+cmdclass={
+    'bdist_wheel':     Bdist_wheel
+}
     
 setup(
     name='GSASII',
