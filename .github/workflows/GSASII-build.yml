@@ -95,7 +95,7 @@ jobs:
         run: |
           sudo ln -s /usr/local/bin/gfortran-10 /usr/local/bin/gfortran
           mv __init__.py ./GSASII/
-          python setup.py bist_wheel --scons_args "LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/'" FCompiler=gfortran FORTpath=/usr/local/bin/
+          python setup.py bdist_wheel --scons_args "LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/'" FCompiler=gfortran FORTpath=/usr/local/bin/
         env:
           SDKROOT: ''
 
