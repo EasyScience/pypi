@@ -88,7 +88,7 @@ jobs:
       - name: Conda pre-build
         shell: bash -l {0}
         run: |
-          conda install numpy scons -y 
+          conda install numpy scons wheel -y 
           
       - name: Conda build
         shell: bash -l {0}
