@@ -94,35 +94,35 @@ jobs:
         shell: bash -l {0}
         run: |
           sudo ln -s /usr/local/bin/gfortran-10 /usr/local/bin/gfortran
-          cd  ${{ github.workspace }}/GSASII/fsource
-          scons LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/' FCompiler='gfortran' FORTpath=/usr/local/bin/
+          mv __init__.py ./GSASII/
+          python setup.py bist_wheel --scons_args "LDFLAGS='-undefined dynamic_lookup -bundle -L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib/'" FCompiler=gfortran FORTpath=/usr/local/bin/
         env:
           SDKROOT: ''
 
-      - name: Fixup library names
-        run: |
-          cd  ${{ github.workspace }}/GSASII
-          rm -rf bindist
-          mv ./bin ./bindist
-          for n1 in bindist/*.so ; do
-             export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
-            mv ${n1} ${n2}
-          done
-          rm fsource/*.so
-          rm fsource/*.a
+#       - name: Fixup library names
+#         run: |
+#           cd  ${{ github.workspace }}/GSASII
+#           rm -rf bindist
+#           mv ./bin ./bindist
+#           for n1 in bindist/*.so ; do
+#              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
+#             mv ${n1} ${n2}
+#           done
+#           rm fsource/*.so
+#           rm fsource/*.a
           
-      - name: Make packaging structure
-        run: |
-          cd ${{ github.workspace }}
-          mv __init__.py ./GSASII/
-          rm -rf .git .github
+#       - name: Make packaging structure
+#         run: |
+#           cd ${{ github.workspace }}
+#           mv __init__.py ./GSASII/
+#           rm -rf .git .github
           
       - name: Build Wheel
         shell: bash -l {0}
-        if: matrix.os == 'macOS-latest'
         run: |
           pip install delocate
-          pip wheel ./ --no-deps -w ./old/
+          # pip wheel ./ --no-deps -w ./old/
+          mv ./dist ./old
           delocate-wheel -w dist -v old/*.whl
         
       - uses: actions/upload-artifact@v2
@@ -130,116 +130,116 @@ jobs:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
           path: ${{ github.workspace }}/dist
           
-  create-Windows:
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [ '3.6', '3.7', '3.8' ]
-        os: [ windows-latest ]
+#   create-Windows:
+#     strategy:
+#       max-parallel: 4
+#       matrix:
+#         python-version: [ '3.6', '3.7', '3.8' ]
+#         os: [ windows-latest ]
 
-    runs-on: ${{ matrix.os }}
-    needs: get_Latest
+#     runs-on: ${{ matrix.os }}
+#     needs: get_Latest
     
-    steps:
-      - name: Check-out repository
-        uses: actions/checkout@v2
+#     steps:
+#       - name: Check-out repository
+#         uses: actions/checkout@v2
         
-      - uses: actions/download-artifact@v2
-        with:
-          name: GSASII_SRC
-          path: GSASII
-  
-      - uses: actions/download-artifact@v2
-        with:
-          name: GSASII_BIN
-          path: bin
-      
-      - uses: actions/setup-python@v2
-        with:
-          python-version: ${{ matrix.python-version }}
-        
-      - name: Copy pre-compiled libs
-        shell: bash
-        run: |
-          export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.15
-          echo $LIB_DIR
-          if [ ! -d "$LIB_DIR" ] 
-          then
-              export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.19
-              echo $LIB_DIR
-          fi
-          mv $LIB_DIR/* GSASII/bindist/
-          
-      - name: Make packaging structure
-        run: |
-          mv __init__.py ./GSASII/
-          
-      - name: Build Wheel
-        run: |
-          pip install wheel
-          pip wheel ./ --no-deps -w ./dist
-        
-      - uses: actions/upload-artifact@v2
-        with:
-          name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
-          path: ${{ github.workspace }}/dist
-  
-#       - uses: conda-incubator/setup-miniconda@v2
+#       - uses: actions/download-artifact@v2
 #         with:
-#           miniconda-version: "latest"
-#           activate-environment: foo
+#           name: GSASII_SRC
+#           path: GSASII
+  
+#       - uses: actions/download-artifact@v2
+#         with:
+#           name: GSASII_BIN
+#           path: bin
+      
+#       - uses: actions/setup-python@v2
+#         with:
 #           python-version: ${{ matrix.python-version }}
-          
-#       - name: Conda pre-build
-#         shell: bash -l {0}
+        
+#       - name: Copy pre-compiled libs
+#         shell: bash
 #         run: |
-#           conda install -c conda-forge fortran-compiler numpy scons -y
-          
-#       - name: Conda build
-#         shell: bash -l {0}
-#         run: |
-#           cd  GSASII/fsource
-#           scons
-
-#       - name: Fixup library names
-#         run: |
-#           cd  ../
-#           rm -rf bindist
-#           mv ./bin ./bindist
-#           for n1 in bindist/*.pyd ; do
-#              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
-#             mv ${n1} ${n2}
-#           done
+#           export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.15
+#           echo $LIB_DIR
+#           if [ ! -d "$LIB_DIR" ] 
+#           then
+#               export LIB_DIR=bin/win_64_p${{ matrix.python-version }}_n1.19
+#               echo $LIB_DIR
+#           fi
+#           mv $LIB_DIR/* GSASII/bindist/
           
 #       - name: Make packaging structure
 #         run: |
-#           cd ../
 #           mv __init__.py ./GSASII/
-#           rm -rf .git .github
+          
+#       - name: Build Wheel
+#         run: |
+#           pip install wheel
+#           pip wheel ./ --no-deps -w ./dist
         
 #       - uses: actions/upload-artifact@v2
 #         with:
 #           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
-#           path: ${{ github.workspace }}
+#           path: ${{ github.workspace }}/dist
+  
+# #       - uses: conda-incubator/setup-miniconda@v2
+# #         with:
+# #           miniconda-version: "latest"
+# #           activate-environment: foo
+# #           python-version: ${{ matrix.python-version }}
+          
+# #       - name: Conda pre-build
+# #         shell: bash -l {0}
+# #         run: |
+# #           conda install -c conda-forge fortran-compiler numpy scons -y
+          
+# #       - name: Conda build
+# #         shell: bash -l {0}
+# #         run: |
+# #           cd  GSASII/fsource
+# #           scons
 
-#       - uses: actions/upload-artifact@v2
-#         with:
-#           name: CrysFML - Windows - Python ${{ matrix.python-version }}
-#           path: ./dist/*.whl
+# #       - name: Fixup library names
+# #         run: |
+# #           cd  ../
+# #           rm -rf bindist
+# #           mv ./bin ./bindist
+# #           for n1 in bindist/*.pyd ; do
+# #              export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
+# #             mv ${n1} ${n2}
+# #           done
+          
+# #       - name: Make packaging structure
+# #         run: |
+# #           cd ../
+# #           mv __init__.py ./GSASII/
+# #           rm -rf .git .github
+        
+# #       - uses: actions/upload-artifact@v2
+# #         with:
+# #           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
+# #           path: ${{ github.workspace }}
 
-  Upload_Artifacts:
-    runs-on: ubuntu-latest
-    needs: [create-Linux, create-OSX, create-Windows]
-    steps:
-    - uses: actions/download-artifact@v2
-    - name: Upload Artifacts GitHub releases
-      uses: ncipollo/release-action@v1
-      with:
-        draft: false
-        prerelease: true
-        allowUpdates: true
-        replacesArtifacts: true
-        token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "./**/*.whl"
-        tag: "GSASII"
-        body: "This is a build of the GSASII libraries."
+# #       - uses: actions/upload-artifact@v2
+# #         with:
+# #           name: CrysFML - Windows - Python ${{ matrix.python-version }}
+# #           path: ./dist/*.whl
+
+#   Upload_Artifacts:
+#     runs-on: ubuntu-latest
+#     needs: [create-Linux, create-OSX, create-Windows]
+#     steps:
+#     - uses: actions/download-artifact@v2
+#     - name: Upload Artifacts GitHub releases
+#       uses: ncipollo/release-action@v1
+#       with:
+#         draft: false
+#         prerelease: true
+#         allowUpdates: true
+#         replacesArtifacts: true
+#         token: ${{ secrets.GITHUB_TOKEN }}
+#         artifacts: "./**/*.whl"
+#         tag: "GSASII"
+#         body: "This is a build of the GSASII libraries."
