@@ -75,6 +75,15 @@ class InstallSconsLibs(install_lib):
         install_dir = os.path.join(self.build_dir, 'GSASII', 'bindist')
         for i in os.listdir(bin_dir):
             shutil.move(os.path.join(bin_dir, i), install_dir)
+        src_dir = os.path.join(self.build_dir, 'GSASII', 'fsource')
+
+        tmp_files = [os.path.join(src_dir, _pyd) for _pyd in
+                    os.listdir(src_dir) if
+                    os.path.isfile(os.path.join(src_dir, _pyd)) and
+                    os.path.splitext(_pyd)[1] in [".pyd", ".so", '.o', '.a']]
+        for file in tmp_files:
+            os.remove(file)
+
         # Must be forced to run after adding the libs to data_files
         self.distribution.run_command("install_data")
         super().run()
