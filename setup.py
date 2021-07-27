@@ -1,6 +1,12 @@
 from setuptools import setup
 import platform
 
+from setuptools.command.install import install
+class InstallPlatlib(install):
+    def finalize_options(self):
+        install.finalize_options(self)
+        if self.distribution.has_ext_modules():
+            self.install_lib = self.install_platlib
 
 try:
     from wheel.bdist_wheel import bdist_wheel as _bdist_wheel
@@ -23,7 +29,8 @@ except ImportError:
 # cmdclass = {}
 # if platform.system() != 'Linux':
 cmdclass={
-    'bdist_wheel':     Bdist_wheel
+    'bdist_wheel': Bdist_wheel,
+    'install':     InstallPlatlib
 }
     
 setup(
