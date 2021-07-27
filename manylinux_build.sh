@@ -20,7 +20,8 @@ mv /io/__init__.py /io/GSASII/
 # Compile wheels
 for PYBIN in /opt/python/*/bin; do
   "${PYBIN}/pip" install numpy scons
-  "${PYBIN}/pip" wheel /io/ --no-deps --use-feature=in-tree-build -w /io/dist/
+  export SCONS_PATH=${PYBIN}/scons
+  "${PYBIN}/python" setup.py bdist_wheel
   rm fsource/*.so
   rm fsource/*.a
   rm -rf /io/build/
@@ -34,4 +35,5 @@ done
 # Install packages and test
 for PYBIN in /opt/python/*/bin/; do
   "${PYBIN}/pip" install GSASII --no-index -f /io/dist
+  "${PYBIN}/python" -c 'from GSASII import GSASIIscriptable as GS2; exit()'
 done
