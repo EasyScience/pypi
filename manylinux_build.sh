@@ -21,6 +21,7 @@ mv /io/__init__.py /io/GSASII/
 for PYBIN in /opt/python/*/bin; do
   "${PYBIN}/pip" install numpy scons
   export SCONS_PATH=${PYBIN}/scons
+  cd /io
   "${PYBIN}/python" setup.py bdist_wheel
   rm fsource/*.so
   rm fsource/*.a
