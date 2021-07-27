@@ -14,8 +14,8 @@ try:
 
         def get_tag(self):
             python, abi, plat = _bdist_wheel.get_tag(self)
-            if platform.system() != 'Windows':
-                python, abi = 'py3', 'none'
+#             if platform.system() != 'Windows':
+#                 python, abi = 'py3', 'none'
             return python, abi, plat
 except ImportError:
     Bdist_wheel = None
