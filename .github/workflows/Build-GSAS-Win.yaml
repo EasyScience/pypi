@@ -1,4 +1,4 @@
-name: Python libs
+name: Python libs - Win
 
 on:
   push:
