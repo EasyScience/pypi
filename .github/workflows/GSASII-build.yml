@@ -159,9 +159,9 @@ jobs:
         run: |
           mv __init__.py ./GSASII/
           ls C:/Miniconda3/envs/foo
-          ls C:/Miniconda3/envs/foo/mingw-w64
-          ls C:/Miniconda3/envs/foo/mingw-w64/bin
-          python setup.py bdist_wheel --scons_args FCompiler=gfortran FORTpath=C:/Miniconda3/envs/foo/mingw-w64/bin
+          ls C:/Miniconda3/envs/foo/Library/mingw-w64
+          ls C:/Miniconda3/envs/foo/Library/mingw-w64/bin
+          python setup.py bdist_wheel --scons_args FCompiler=gfortran FORTpath=C:/Miniconda3/envs/foo/Library/mingw-w64/bin
         env:
           SDKROOT: ''
         
