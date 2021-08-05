@@ -115,6 +115,7 @@ jobs:
     steps:
     - name: Find wheels
       run: |
+        shell: pwsh
         pwd
         Get-ChildItem -Recurse -Filter "*.whl"
     - uses: actions/download-artifact@v2
