@@ -87,15 +87,15 @@ jobs:
           cd  GSASII/fsource
           scons
 
-      - name: Fixup library names
-        run: |
-          cd  ../
-          rm -rf bindist
-          mv ./bin ./bindist
-          for n1 in bindist/*.pyd ; do
-             export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
-            mv ${n1} ${n2}
-          done
+      # - name: Fixup library names
+      #   run: |
+      #     cd  ../
+      #     rm -rf bindist
+      #     mv ./bin ./bindist
+      #     for n1 in bindist/*.pyd ; do
+      #        export n2="$( cut -d '.' -f 1 <<< "$n1" ).so"
+      #       mv ${n1} ${n2}
+      #     done
 
       - name: Make packaging structure
         run: |
@@ -108,10 +108,10 @@ jobs:
           name: GSAS-II - ${{ matrix.os }} - Python ${{ matrix.python-version }}
           path: ${{ github.workspace }}
 
-      - uses: actions/upload-artifact@v2
-        with:
-          name: CrysFML - Windows - Python ${{ matrix.python-version }}
-          path: ./dist/*.whl
+      # - uses: actions/upload-artifact@v2
+      #   with:
+      #     name: CrysFML - Windows - Python ${{ matrix.python-version }}
+      #     path: ./dist/*.whl
 
   # Upload_Artifacts:
   #   runs-on: ubuntu-latest
