@@ -113,11 +113,13 @@ jobs:
     # needs: [create-Linux, create-OSX, create-Windows]
     needs: [create-Windows]
     steps:
+    - name: Find wheels
+      run: |
+        pwd
+        dir /s /b *.whl
     - uses: actions/download-artifact@v2
     - name: Upload Artifacts GitHub releases
       uses: ncipollo/release-action@v1
-      run: |
-        dir /s /b *.whl
       with:
         draft: false
         prerelease: true
