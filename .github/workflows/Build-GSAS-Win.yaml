@@ -114,8 +114,8 @@ jobs:
     needs: [create-Windows]
     steps:
     - name: Find wheels
+      shell: pwsh
       run: |
-        shell: pwsh
         pwd
         Get-ChildItem -Recurse -Filter "*.whl"
     - uses: actions/download-artifact@v2
