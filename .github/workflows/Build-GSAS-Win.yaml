@@ -116,7 +116,7 @@ jobs:
     - name: Find wheels
       run: |
         pwd
-        dir /s /b *.whl
+        Get-ChildItem -Recurse -Filter "*.whl"
     - uses: actions/download-artifact@v2
     - name: Upload Artifacts GitHub releases
       uses: ncipollo/release-action@v1
