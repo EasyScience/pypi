@@ -116,12 +116,14 @@ jobs:
     - uses: actions/download-artifact@v2
     - name: Upload Artifacts GitHub releases
       uses: ncipollo/release-action@v1
+      run: |
+        dir /s /b *.whl
       with:
         draft: false
         prerelease: true
         allowUpdates: true
         replacesArtifacts: true
         token: ${{ secrets.GITHUB_TOKEN }}
-        artifacts: "./**/*.whl"
+        artifacts: "dist/*.whl"
         tag: "GSASII"
         body: "This is a build of the GSASII libraries."
