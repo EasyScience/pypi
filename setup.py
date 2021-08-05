@@ -27,20 +27,16 @@ class BuildSconsLibs(build_ext):
 
     def run(self):
         for extension in self.extensions:
-            print(" >>> BUILDING EXTENSION - {}".format(str(extension)))
             self.build_scons(extension)
 
     def build_scons(self, extension: Extension):
         print("Calling SCons to build the module")
         src_dir = os.path.join(self.build_lib, 'GSASII', 'fsource')
-        print("SRC DIR: {}".format(src_dir))
         scons_path = [os.environ.get('SCONS_PATH', 'scons')]
         scons_path = scons_path + scons_vars
-        print("SCONS_PATH = {}".format(scons_path))
         subprocess.check_call(scons_path, cwd=src_dir)
         bin_dir = os.path.join(self.build_lib, 'GSASII', 'bindist')
         os.makedirs(bin_dir, exist_ok=True)
-        print("made bin_dir = {}".format(bin_dir))
         self.distribution.bin_dir = bin_dir
 
 
@@ -80,7 +76,6 @@ class InstallSconsLibs(install_lib):
         for i in os.listdir(bin_dir):
             shutil.move(os.path.join(bin_dir, i), install_dir)
         src_dir = os.path.join(self.build_dir, 'GSASII', 'fsource')
-        print(">>> src_dir in run  = {}".format(src_dir))
         tmp_files = [os.path.join(src_dir, _pyd) for _pyd in
                     os.listdir(src_dir) if
                     os.path.isfile(os.path.join(src_dir, _pyd)) and
@@ -105,7 +100,7 @@ if "--scons_args" in sys.argv:
 setup(
     name='GSASII',
     version='0.0.1',
-    packages=['GSASII', 'GSASII.CifFile', 'GSASII.fsource', 'GSASII.exports', 'GSASII.NIST_profile'],
+    packages=['GSASII', 'GSASII.CifFile', 'GSASII.exports', 'GSASII.NIST_profile'],
     url='https://subversion.xray.aps.anl.gov/pyGSAS/',
     ext_modules=[SconsExtension(name='GSASII')],
     license='BSD3',

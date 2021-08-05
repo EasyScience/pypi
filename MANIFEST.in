@@ -1,0 +1,5 @@
+recursive-include GSASII/bindist *
+recursive-include GSASII/fsource *
+recursive-include GSASII/GSASIImacros *
+recursive-include GSASII/help *
+recursive-include GSASII/imports *
