@@ -141,6 +141,9 @@ jobs:
         run: |
           mv __init__.py ./GSASII/
           python setup.py bdist_wheel --scons_args FCompiler=gfortran FORTpath=C:/Miniconda3/envs/foo/Library/mingw-w64/bin
+          mv ./dist ./old
+          pip install delvewheel
+          delvewheel repair --no-mangle-all -w dist -v ./old/*.whl
         env:
           SDKROOT: ''
 
