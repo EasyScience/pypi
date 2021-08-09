@@ -1,4 +1,4 @@
-name: Python libs - Linux, OSX
+name: Python libs - Linux, OSX, Windows
 
 on:
   push:
