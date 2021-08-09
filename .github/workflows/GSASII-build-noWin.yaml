@@ -2,9 +2,9 @@ name: Python libs - Linux, OSX
 
 on:
   push:
-    branches: [ GSASII ]
+    branches: [ gsas ]
   pull_request:
-    branches: [ GSASII ]
+    branches: [ gsas ]
 
 #   schedule:
 #   # Every day at 1am
